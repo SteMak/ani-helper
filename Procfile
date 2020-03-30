@@ -1,1 +1,1 @@
-worker: bin/worker
+worker: ./worker

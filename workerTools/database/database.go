@@ -5,6 +5,8 @@ import (
 
 	"github.com/SteMak/ani-helper/workerTools/config"
 	"github.com/jinzhu/gorm"
+	// driver db
+	_ "github.com/jinzhu/gorm/dialects/postgres"
 )
 
 var (
