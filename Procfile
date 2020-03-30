@@ -1,1 +1,1 @@
-worker: ./worker
+worker: main
