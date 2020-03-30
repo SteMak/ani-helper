@@ -5,13 +5,13 @@ WORKDIR /app
 COPY . .
 
 RUN go build \
-        -o /bin/worker \
+        -o /app/bin/worker \
         /app/main/worker.go
 
 
 FROM alpine:3.11
 
-COPY --from=build /bin /bin
+COPY --from=build /app/bin /bin
 
 WORKDIR /bin
 
