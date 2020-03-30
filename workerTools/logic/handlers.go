@@ -21,7 +21,7 @@ type simplifiedUser struct {
 func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	if m.GuildID == config.GdHouseID {
 		if m.Content == "R U TYT?" && m.ChannelID == config.ChForLogsID {
-			s.ChannelMessageSend(m.ChannelID, "E IM TYT!")
+			s.ChannelMessageSend(m.ChannelID, "I TYT KUSHAU!")
 			return
 		}
 
