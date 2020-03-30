@@ -91,5 +91,5 @@ func Init() {
 
 	RoRequestMakerID = os.Getenv("RO_REQUEST_MAKER_ID")
 
-	PostgresURI = os.Getenv("POSTGRES_URI")
+	PostgresURI = os.Getenv("DATABASE_URL")
 }
