@@ -1,6 +1,6 @@
 module github.com/SteMak/ani-helper
 
-go 1.14
+go 1.12
 
 require (
 	github.com/bwmarrin/discordgo v0.20.2
