@@ -2,7 +2,6 @@ package logic
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/SteMak/ani-helper/workerTools/config"
 	"github.com/SteMak/ani-helper/workerTools/database"
@@ -41,13 +40,14 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 			return
 		}
 
-		if strings.HasPrefix(m.Content, "-запрос") {
+		isRequest, request := checkRequest(m.Content)
+		if isRequest {
 			member, err := s.GuildMember(config.GdHouseID, m.Author.ID)
 			if err != nil {
 				return
 			}
 			if len(member.Roles) > 0 && hasRole(member, config.RoRequestMakerID) {
-				detectRequest(s, m)
+				detectRequest(s, m.ChannelID, "-запрос"+request)
 				return
 			}
 		}

@@ -166,17 +166,17 @@ func hasRole(member *discordgo.Member, id string) bool {
 	return false
 }
 
-func detectRequest(s *discordgo.Session, m *discordgo.MessageCreate) {
-	if m.Content == "-запрос" {
-		s.ChannelMessageSend(m.ChannelID, config.Usage)
+func detectRequest(s *discordgo.Session, channelID, content string) {
+	if content == "-запрос" {
+		s.ChannelMessageSend(channelID, config.Usage)
 		return
 	}
 
-	if !strings.HasPrefix(m.Content, "-запрос ") {
+	if !strings.HasPrefix(content, "-запрос ") {
 		return
 	}
 
-	item, err := queryIntoRecord(s, m)
+	item, err := queryIntoRecord(s, channelID, content)
 	if err != nil {
 		fmt.Println("BADQR parsing query:", err)
 		return
@@ -188,7 +188,7 @@ func detectRequest(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 
-	_, err = s.ChannelMessageSend(m.ChannelID, "Запрос отправлен")
+	_, err = s.ChannelMessageSend(channelID, "Запрос отправлен")
 	if err != nil {
 		fmt.Println("ERROR sending confirm message", err)
 	}
@@ -196,15 +196,15 @@ func detectRequest(s *discordgo.Session, m *discordgo.MessageCreate) {
 	fmt.Println("GUILD " + item.EmbedID + " request sended")
 }
 
-func queryIntoRecord(s *discordgo.Session, m *discordgo.MessageCreate) (*database.Record, error) {
-	item, err := parseQuery(s, m.ChannelID, m.Content)
+func queryIntoRecord(s *discordgo.Session, channelID, content string) (*database.Record, error) {
+	item, err := parseQuery(s, channelID, content)
 	if err != nil {
 		return item, err
 	}
 
-	fmt.Println("FOUND request message", m.Content)
+	fmt.Println("FOUND request message", content)
 
-	err = resendRequest(s, m, item)
+	err = resendRequest(s, channelID, content, item)
 	if err != nil {
 		return item, err
 	}
@@ -297,12 +297,12 @@ func parseQuery(s *discordgo.Session, channelID, content string) (*database.Reco
 	return item, nil
 }
 
-func resendRequest(s *discordgo.Session, m *discordgo.MessageCreate, item *database.Record) error {
+func resendRequest(s *discordgo.Session, channelID, content string, item *database.Record) error {
 	resultErr := errors.New("resending failure")
 
 	message, err := s.ChannelMessageSendEmbed(config.ChForRequestID, createEmbed(s, item, 225225))
 	if err != nil {
-		s.ChannelMessageSend(m.ChannelID, "Не удалось отправить запрос")
+		s.ChannelMessageSend(channelID, "Не удалось отправить запрос")
 		fmt.Println("ERROR sending request", err)
 		return resultErr
 	}
@@ -360,4 +360,18 @@ func makeParsingBetter(str string) string {
 	}
 
 	return result
+}
+
+func checkRequest(str string) (bool, string) {
+	if strings.HasPrefix(str, "-запрос") {
+		return true, strings.TrimPrefix(str, "-запрос")
+	}
+	if strings.HasPrefix(str, "- запрос") {
+		return true, strings.TrimPrefix(str, "- запрос")
+	}
+	if strings.HasPrefix(str, "-  запрос") {
+		return true, strings.TrimPrefix(str, "-  запрос")
+	}
+
+	return false, ""
 }
