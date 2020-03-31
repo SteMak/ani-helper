@@ -197,7 +197,7 @@ func detectRequest(s *discordgo.Session, m *discordgo.MessageCreate) {
 }
 
 func queryIntoRecord(s *discordgo.Session, m *discordgo.MessageCreate) (*database.Record, error) {
-	item, err := parseQuery(s, m)
+	item, err := parseQuery(s, m.ChannelID, makeParsingBetter(m.Content))
 	if err != nil {
 		return item, err
 	}
@@ -212,22 +212,22 @@ func queryIntoRecord(s *discordgo.Session, m *discordgo.MessageCreate) (*databas
 	return item, nil
 }
 
-func parseQuery(s *discordgo.Session, m *discordgo.MessageCreate) (*database.Record, error) {
+func parseQuery(s *discordgo.Session, channelID, content string) (*database.Record, error) {
 	resultErr := errors.New("parse failure")
 
-	args := strings.Split(strings.TrimPrefix(m.Content, "-запрос "), "->")
+	args := strings.Split(strings.TrimPrefix(content, "-запрос "), "->")
 	if len(args) > 2 {
-		s.ChannelMessageSend(m.ChannelID, "Обнаружена лишняя \"->\"")
+		s.ChannelMessageSend(channelID, "Обнаружена лишняя \"->\"")
 		return nil, resultErr
 	}
 	if len(args) < 2 {
-		s.ChannelMessageSend(m.ChannelID, "Где \"->\"?")
+		s.ChannelMessageSend(channelID, "Где \"->\"?")
 		return nil, resultErr
 	}
 
 	reason := strings.TrimSpace(args[0])
 	if len(reason) == 0 {
-		s.ChannelMessageSend(m.ChannelID, "Причина не должна быть пустой")
+		s.ChannelMessageSend(channelID, "Причина не должна быть пустой")
 		return nil, resultErr
 	}
 
@@ -235,7 +235,7 @@ func parseQuery(s *discordgo.Session, m *discordgo.MessageCreate) (*database.Rec
 	item.Reason = reason
 
 	if len(args[1]) == 0 {
-		s.ChannelMessageSend(m.ChannelID, "Не указаны юзвери и их деньги")
+		s.ChannelMessageSend(channelID, "Не указаны юзвери и их деньги")
 		return nil, resultErr
 	}
 
@@ -243,20 +243,20 @@ func parseQuery(s *discordgo.Session, m *discordgo.MessageCreate) (*database.Rec
 	pairsUsersSum := strings.Split(strings.TrimSpace(args[1]), ",")
 	for _, pairUsersSum := range pairsUsersSum {
 		if len(pairUsersSum) == 0 {
-			s.ChannelMessageSend(m.ChannelID, "Не указаны юзвери и их деньги")
+			s.ChannelMessageSend(channelID, "Не указаны юзвери и их деньги")
 			return nil, resultErr
 		}
 
 		usersSum, err := splitReverse1(strings.TrimSpace(pairUsersSum), " ")
 
 		if len(usersSum[0]) == 0 {
-			s.ChannelMessageSend(m.ChannelID, "В указании юзверей или суммы содержится ошибка")
+			s.ChannelMessageSend(channelID, "В указании юзверей или суммы содержится ошибка")
 			return nil, resultErr
 		}
 
 		sum, err := strconv.ParseUint(strings.TrimSpace(usersSum[1]), 10, 64)
 		if err != nil {
-			s.ChannelMessageSend(m.ChannelID, "В указании юзверей или суммы содержится ошибка")
+			s.ChannelMessageSend(channelID, "В указании юзверей или суммы содержится ошибка")
 			return nil, resultErr
 		}
 
@@ -264,7 +264,7 @@ func parseQuery(s *discordgo.Session, m *discordgo.MessageCreate) (*database.Rec
 
 		for i := 0; i < len(users); i++ {
 			if !strings.HasPrefix(users[i], "<@") || !strings.HasSuffix(users[i], ">") {
-				s.ChannelMessageSend(m.ChannelID, "В юзверях затесался шпион")
+				s.ChannelMessageSend(channelID, "В юзверях затесался шпион")
 				return nil, resultErr
 			}
 			users[i] = strings.TrimPrefix(users[i], "<@")
@@ -273,7 +273,7 @@ func parseQuery(s *discordgo.Session, m *discordgo.MessageCreate) (*database.Rec
 
 			_, err = s.GuildMember(config.GdHouseID, users[i])
 			if err != nil {
-				s.ChannelMessageSend(m.ChannelID, "В юзверях затесался шпион")
+				s.ChannelMessageSend(channelID, "В юзверях затесался шпион")
 				return nil, resultErr
 			}
 		}
@@ -345,4 +345,17 @@ func emojiOnRequest(s *discordgo.Session, r *discordgo.MessageReactionAdd, item 
 		fmt.Println("ERROR delete record", err)
 		return
 	}
+}
+
+func makeParsingBetter(str string) string {
+	result := str
+	for _, rep := range config.FairyReplacement {
+		result = strings.Join(strings.Split(result, rep[0]), rep[1])
+	}
+
+	if result != str {
+		return makeParsingBetter(result)
+	}
+
+	return result
 }

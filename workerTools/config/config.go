@@ -70,6 +70,23 @@ var (
 		"ɔıloqoou написал %s перевёрнутыти буквами, поэтому вы неспеша забрали %s",
 		"Фузу мирно рисовала в войсе, а Вы сделали %s и собрали %s",
 	}
+
+	// FairyReplacement for good parse
+	FairyReplacement = [][2]string{
+		[2]string{"  "," "},
+		[2]string{",,",","},
+		[2]string{"><","> <"},
+		[2]string{">1","> 1"},
+		[2]string{">2","> 2"},
+		[2]string{">3","> 3"},
+		[2]string{">4","> 4"},
+		[2]string{">5","> 5"},
+		[2]string{">6","> 6"},
+		[2]string{">7","> 7"},
+		[2]string{">8","> 8"},
+		[2]string{">9","> 9"},
+		[2]string{">0","> 0"},
+	}
 )
 
 // Init inits main vars for the project
