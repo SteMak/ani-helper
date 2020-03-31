@@ -110,7 +110,7 @@ func splitReverse1(str string, sep string) ([2]string, error) {
 	return [2]string{"", str}, errors.New("")
 }
 
-func createEmbed(item *database.Record, color int) *discordgo.MessageEmbed {
+func createEmbed(s * discordgo.Session, item *database.Record, color int) *discordgo.MessageEmbed {
 	var users string
 
 	uss := database.Uss{}
@@ -123,12 +123,12 @@ func createEmbed(item *database.Record, color int) *discordgo.MessageEmbed {
 				_, err := config.API.AddToBalance(config.GdHouseID, user, 0, int(userSum.Sum), item.Reason)
 				if err != nil {
 					fmt.Println("ERROR "+item.EmbedID+" add money to user balance:", err)
-					_, err = session.ChannelMessageSend(config.ChForLogsID, "Кажись, что-то пошло не так... <@"+user+"> не получил денег за "+item.Reason)
+					_, err = s.ChannelMessageSend(config.ChForLogsID, "Кажись, что-то пошло не так... <@"+user+"> не получил денег за "+item.Reason)
 					if err != nil {
 						fmt.Println("ERROR "+item.EmbedID+" sending wrong report message:", err)
 					}
 				} else {
-					_, err = session.ChannelMessageSend(config.ChForLogsID, strconv.FormatUint(userSum.Sum, 10)+"<:AH_AniCoin:579712087224483850> были выданы <@"+user+">, за "+item.Reason)
+					_, err = s.ChannelMessageSend(config.ChForLogsID, strconv.FormatUint(userSum.Sum, 10)+"<:AH_AniCoin:579712087224483850> были выданы <@"+user+">, за "+item.Reason)
 					if err != nil {
 						fmt.Println("ERROR "+item.EmbedID+" sending right report message:", err)
 					}
@@ -298,7 +298,7 @@ func parseQuery(s *discordgo.Session, m *discordgo.MessageCreate) (*database.Rec
 func resendRequest(s *discordgo.Session, m *discordgo.MessageCreate, item *database.Record) error {
 	resultErr := errors.New("resending failure")
 
-	message, err := s.ChannelMessageSendEmbed(config.ChForRequestID, createEmbed(item, 225225))
+	message, err := s.ChannelMessageSendEmbed(config.ChForRequestID, createEmbed(s, item, 225225))
 	if err != nil {
 		s.ChannelMessageSend(m.ChannelID, "Не удалось отправить запрос")
 		fmt.Println("ERROR sending request", err)
@@ -324,14 +324,14 @@ func resendRequest(s *discordgo.Session, m *discordgo.MessageCreate, item *datab
 func emojiOnRequest(s *discordgo.Session, r *discordgo.MessageReactionAdd, item *database.Record) {
 	switch r.Emoji.Name {
 	case "✅":
-		_, err = s.ChannelMessageEditEmbed(config.ChForRequestID, item.EmbedID, createEmbed(item, 255255))
+		_, err = s.ChannelMessageEditEmbed(config.ChForRequestID, item.EmbedID, createEmbed(s, item, 255255))
 		if err != nil {
 			fmt.Println("ERROR edit embed on ✅", err)
 			return
 		}
 
 	case "🇽":
-		_, err = s.ChannelMessageEditEmbed(config.ChForRequestID, item.EmbedID, createEmbed(item, 15158332))
+		_, err = s.ChannelMessageEditEmbed(config.ChForRequestID, item.EmbedID, createEmbed(s, item, 15158332))
 		if err != nil {
 			fmt.Println("ERROR edit embed on 🇽", err)
 			return

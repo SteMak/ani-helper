@@ -7,10 +7,6 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-var (
-	session discordgo.Session
-)
-
 // Init initialize discord session
 func Init() {
 	fmt.Println("1 WORKER started")
