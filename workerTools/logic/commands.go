@@ -110,7 +110,7 @@ func splitReverse1(str string, sep string) ([2]string, error) {
 	return [2]string{"", str}, errors.New("")
 }
 
-func createEmbed(s * discordgo.Session, item *database.Record, color int) *discordgo.MessageEmbed {
+func createEmbed(s *discordgo.Session, item *database.Record, color int) *discordgo.MessageEmbed {
 	var users string
 
 	uss := database.Uss{}
@@ -197,7 +197,7 @@ func detectRequest(s *discordgo.Session, m *discordgo.MessageCreate) {
 }
 
 func queryIntoRecord(s *discordgo.Session, m *discordgo.MessageCreate) (*database.Record, error) {
-	item, err := parseQuery(s, m.ChannelID, makeParsingBetter(m.Content))
+	item, err := parseQuery(s, m.ChannelID, m.Content)
 	if err != nil {
 		return item, err
 	}
@@ -239,8 +239,10 @@ func parseQuery(s *discordgo.Session, channelID, content string) (*database.Reco
 		return nil, resultErr
 	}
 
+	args[1] = makeParsingBetter(strings.TrimSuffix(strings.TrimPrefix(strings.TrimSpace(args[1]), ","), ","))
+
 	var usersSumDB database.Uss
-	pairsUsersSum := strings.Split(strings.TrimSpace(args[1]), ",")
+	pairsUsersSum := strings.Split(args[1], ",")
 	for _, pairUsersSum := range pairsUsersSum {
 		if len(pairUsersSum) == 0 {
 			s.ChannelMessageSend(channelID, "Не указаны юзвери и их деньги")

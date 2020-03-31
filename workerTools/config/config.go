@@ -75,6 +75,7 @@ var (
 	FairyReplacement = [][2]string{
 		[2]string{"  "," "},
 		[2]string{",,",","},
+		[2]string{", ,",","},
 		[2]string{"><","> <"},
 		[2]string{">1","> 1"},
 		[2]string{">2","> 2"},
