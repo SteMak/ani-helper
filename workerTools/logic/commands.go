@@ -128,6 +128,10 @@ func createEmbed(s *discordgo.Session, item *database.Record, color int) *discor
 						fmt.Println("ERROR "+item.EmbedID+" sending wrong report message:", err)
 					}
 				} else {
+					_, err = s.ChannelMessageSend(config.ChForInfoRequestID, "<@"+user+">, "+"Вы получили "+strconv.FormatUint(userSum.Sum, 10)+"<:AH_AniCoin:579712087224483850>. Причина: "+item.Reason)
+					if err != nil {
+						fmt.Println("ERROR "+item.EmbedID+" sending right info message:", err)
+					}
 					_, err = s.ChannelMessageSend(config.ChForLogsID, strconv.FormatUint(userSum.Sum, 10)+"<:AH_AniCoin:579712087224483850> были выданы <@"+user+">, за "+item.Reason)
 					if err != nil {
 						fmt.Println("ERROR "+item.EmbedID+" sending right report message:", err)

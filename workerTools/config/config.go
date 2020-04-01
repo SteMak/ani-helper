@@ -28,6 +28,8 @@ var (
 	ChForLogsID string
 	// ChForBumpSiupID for monitoring
 	ChForBumpSiupID string
+	// ChForInfoRequestID for give info about award to user
+	ChForInfoRequestID string
 
 	// UsConfirmatorID userID
 	UsConfirmatorID string
@@ -61,14 +63,15 @@ var (
 		"Вы наблюдали за программированием Стёмы и Меро, но не забыли сделать %s и получили %s",
 		"Меро уходил спать, но %sнул за Вас и вы получили %s",
 		"Нев отвлёк всех разговорами об отсутствии холодильника и вы %sнули сервер. Холодильник дал вам %s",
-		"Кемпер поднимал актив, чтобы кемперить сакуру, так что вы тихо %sнули сервер и получили %s",
+		"Кемпер поднимал актив, чтобы кемперить АниКоины, так что вы тихо %sнули сервер и получили %s",
 		"Вы вычислили Маргинала и он рассказал вам секрет %sанья. Получено %s",
 		"у Боннуса провис интернет, так что вы беспрепятствеено %sнули сервер и забрали %s",
 		"Эксля заснул, что-то бормоча во сне: \"Z-z-z... %s Z-z-z... %s Z-z-z...\"",
-		"Эспада зажала Вас в тиски, но вы успели сделать %s и они Вас зауважали и дали %s",
+		"Эспада зажала Вас в тиски, но вы успели сделать %s. Они зауважали Вас и дали %s",
 		"Маю-Маю снова уснула в войсе, вы вдохновились её ворочанием и %sнули, заработав %s",
 		"ɔıloqoou написал %s перевёрнутыти буквами, поэтому вы неспеша забрали %s",
 		"Фузу мирно рисовала в войсе, а Вы сделали %s и собрали %s",
+		"Кнопка рассматривал ответы бота, Вы сделав %s добавили ещё один и в недоумевающий Кнопыч вручил Вам %s",
 	}
 
 	// FairyReplacement for good parse
@@ -101,7 +104,8 @@ func Init() {
 
 	ChForRequestID = os.Getenv("CH_FOR_REQUEST_ID")
 	ChForLogsID = os.Getenv("CH_FOR_LOGS_ID")
-	ChForBumpSiupID = os.Getenv("CH_FOR_BUMP_SIUP")
+	ChForBumpSiupID = os.Getenv("CH_FOR_BUMP_SIUP_ID")
+	ChForInfoRequestID = os.Getenv("CH_FOR_INFO_REQUEST_ID")
 
 	UsConfirmatorID = os.Getenv("US_CONFIRMATOR_ID")
 	UsSiupID = os.Getenv("US_SIUP_ID")
