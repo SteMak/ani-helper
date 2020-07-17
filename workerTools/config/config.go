@@ -22,6 +22,9 @@ var (
 	// GdHouseID guildID
 	GdHouseID string
 
+	// SumForPaying money for bump and s.up
+	SumForPaying string
+
 	// ChForRequestID channelID
 	ChForRequestID string
 	// ChForLogsID channelID
@@ -101,6 +104,8 @@ func Init() {
 	API = bankirapi.New(BankirapiToken)
 
 	GdHouseID = os.Getenv("GD_HOUSE_ID")
+
+	SumForPaying = os.Getenv("SUM_FOR_PAYING")
 
 	ChForRequestID = os.Getenv("CH_FOR_REQUEST_ID")
 	ChForLogsID = os.Getenv("CH_FOR_LOGS_ID")

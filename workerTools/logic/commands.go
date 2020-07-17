@@ -46,7 +46,7 @@ func onSiupServer(s *discordgo.Session, m *discordgo.MessageCreate) {
 		if user.strify == m.Embeds[0].Footer.Text {
 			fmt.Println("FOUND S.up user", user.id)
 
-			sendAndLog(s, user.id, "S.up", 3000)
+			sendAndLog(s, user.id, "S.up", config.SumForPaying)
 			return
 		}
 	}
@@ -67,11 +67,15 @@ func onBumpServer(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 	fmt.Println("FOUND Bump user", userID)
 
-	sendAndLog(s, userID, "Bump", 3000)
+	sendAndLog(s, userID, "Bump", config.SumForPaying)
 }
 
-func sendAndLog(s *discordgo.Session, userID string, str string, sum int) {
-	_, err = config.API.AddToBalance(config.GdHouseID, userID, 0, sum, "for "+str)
+func sendAndLog(s *discordgo.Session, userID string, str string, sum string) {
+	isum, err := strconv.Atoi(sum)
+	if err != nil {
+		fmt.Println("ERROR "+str+" parsing sum:", err)
+	}
+	_, err = config.API.AddToBalance(config.GdHouseID, userID, 0, isum, "for "+str)
 	if err != nil {
 		fmt.Println("ERROR "+str+" updating user balance:", err)
 
@@ -87,12 +91,12 @@ func sendAndLog(s *discordgo.Session, userID string, str string, sum int) {
 		return
 	}
 
-	_, err = s.ChannelMessageSend(config.ChForLogsID, strconv.Itoa(sum)+"<:AH_AniCoin:579712087224483850> были выданы <@"+userID+">, за то что он сделал "+str)
+	_, err = s.ChannelMessageSend(config.ChForLogsID, sum+"<:AH_AniCoin:579712087224483850> были выданы <@"+userID+">, за то что он сделал "+str)
 	if err != nil {
 		fmt.Println("ERROR "+str+" sending right report message:", err)
 	}
 
-	_, err = s.ChannelMessageSend(config.ChForBumpSiupID, "<@"+userID+">, "+fmt.Sprintf(config.Responces[rand.Intn(len(config.Responces))], str, strconv.Itoa(sum)+"<:AH_AniCoin:579712087224483850>"))
+	_, err = s.ChannelMessageSend(config.ChForBumpSiupID, "<@"+userID+">, "+fmt.Sprintf(config.Responces[rand.Intn(len(config.Responces))], str, sum+"<:AH_AniCoin:579712087224483850>"))
 	if err != nil {
 		fmt.Println("ERROR "+str+" sending right log message:", err)
 	}
