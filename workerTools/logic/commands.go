@@ -46,7 +46,7 @@ func onSiupServer(s *discordgo.Session, m *discordgo.MessageCreate) {
 		if user.strify == m.Embeds[0].Footer.Text {
 			fmt.Println("FOUND S.up user", user.id)
 
-			sendAndLog(s, user.id, "S.up", 1000)
+			sendAndLog(s, user.id, "S.up", 3000)
 			return
 		}
 	}
@@ -67,7 +67,7 @@ func onBumpServer(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 	fmt.Println("FOUND Bump user", userID)
 
-	sendAndLog(s, userID, "Bump", 1000)
+	sendAndLog(s, userID, "Bump", 3000)
 }
 
 func sendAndLog(s *discordgo.Session, userID string, str string, sum int) {
@@ -148,11 +148,11 @@ func createEmbed(s *discordgo.Session, item *database.Record, color int) *discor
 			IconURL: item.AuthorIcon,
 		},
 		Fields: []*discordgo.MessageEmbedField{
-			&discordgo.MessageEmbedField{
+			{
 				Name:  "Запрос",
 				Value: item.Reason,
 			},
-			&discordgo.MessageEmbedField{
+			{
 				Name:  "Получатели",
 				Value: users,
 			},
@@ -170,7 +170,7 @@ func hasRole(member *discordgo.Member, id string) bool {
 	return false
 }
 
-func detectRequest(s *discordgo.Session, channelID, content string) {
+func detectRequest(s *discordgo.Session, channelID, content string, author *discordgo.User) {
 	if content == "-запрос" {
 		s.ChannelMessageSend(channelID, config.Usage)
 		return
@@ -180,7 +180,7 @@ func detectRequest(s *discordgo.Session, channelID, content string) {
 		return
 	}
 
-	item, err := queryIntoRecord(s, channelID, content)
+	item, err := queryIntoRecord(s, channelID, content, author)
 	if err != nil {
 		fmt.Println("BADQR parsing query:", err)
 		return
@@ -200,8 +200,8 @@ func detectRequest(s *discordgo.Session, channelID, content string) {
 	fmt.Println("GUILD " + item.EmbedID + " request sended")
 }
 
-func queryIntoRecord(s *discordgo.Session, channelID, content string) (*database.Record, error) {
-	item, err := parseQuery(s, channelID, content)
+func queryIntoRecord(s *discordgo.Session, channelID, content string, author *discordgo.User) (*database.Record, error) {
+	item, err := parseQuery(s, channelID, content, author)
 	if err != nil {
 		return item, err
 	}
@@ -216,7 +216,7 @@ func queryIntoRecord(s *discordgo.Session, channelID, content string) (*database
 	return item, nil
 }
 
-func parseQuery(s *discordgo.Session, channelID, content string) (*database.Record, error) {
+func parseQuery(s *discordgo.Session, channelID, content string, author *discordgo.User) (*database.Record, error) {
 	resultErr := errors.New("parse failure")
 
 	args := strings.Split(strings.TrimPrefix(content, "-запрос "), "->")
@@ -237,6 +237,8 @@ func parseQuery(s *discordgo.Session, channelID, content string) (*database.Reco
 
 	item := &database.Record{}
 	item.Reason = reason
+	item.AuthorName = author.Username
+	item.AuthorIcon = author.AvatarURL("128")
 
 	if len(args[1]) == 0 {
 		s.ChannelMessageSend(channelID, "Не указаны юзвери и их деньги")

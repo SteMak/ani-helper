@@ -47,7 +47,7 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 				return
 			}
 			if len(member.Roles) > 0 && hasRole(member, config.RoRequestMakerID) {
-				detectRequest(s, m.ChannelID, "-запрос"+request)
+				detectRequest(s, m.ChannelID, "-запрос"+request, m.Author)
 				return
 			}
 		}
