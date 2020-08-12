@@ -77,6 +77,7 @@ func detectBusts(s *discordgo.Session, m *discordgo.MessageCreate) {
 }
 
 func onSiupServer(s *discordgo.Session, m *discordgo.MessageCreate) {
+	config.LastSiup = time.Now()
 	fmt.Println("FOUND S.up")
 
 	for _, user := range chMonitorWriters {
@@ -91,6 +92,7 @@ func onSiupServer(s *discordgo.Session, m *discordgo.MessageCreate) {
 }
 
 func onBumpServer(s *discordgo.Session, m *discordgo.MessageCreate) {
+	config.LastBump = time.Now()
 	fmt.Println("FOUND Bump")
 
 	userID := strings.Split(strings.Split(m.Embeds[0].Description, "<@")[1], ">")[0]
@@ -110,6 +112,7 @@ func onBumpServer(s *discordgo.Session, m *discordgo.MessageCreate) {
 }
 
 func onLikeServer(s *discordgo.Session, m *discordgo.MessageCreate) {
+	config.LastLike = time.Now()
 	fmt.Println("FOUND Like")
 
 	for _, user := range chMonitorWriters {
