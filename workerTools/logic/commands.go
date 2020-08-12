@@ -517,28 +517,28 @@ func secondsToString(begin string, secs int64) string {
 	mi := ""
 	se := ""
 	h := int(secs / 3600)
-	if h-h/10*10 == 1 {
-		ho = " час "
-	} else if h-h/10*10 < 5 && h-h/10*10 > 1 {
-		ho = " часа "
-	} else {
+	if h-h/10*10 > 4 || h-h/10*10 == 0 || h-h/100*100 > 10 && h-h/100*100 < 15 {
 		ho = " часов "
+	} else if h-h/10*10 == 1 {
+		ho = " час "
+	} else {
+		ho = " часа "
 	}
 	m := int(secs/60) - h*60
-	if m-m/10*10 == 1 {
-		mi = " минуту "
-	} else if m-m/10*10 < 5 && m-m/10*10 > 1 {
-		mi = " минуты "
-	} else {
+	if m-m/10*10 > 4 || m-m/10*10 == 0 || m-m/100*100 > 10 && m-m/100*100 < 15 {
 		mi = " минут "
+	} else if m-m/10*10 == 1 {
+		mi = " минуту "
+	} else {
+		mi = " минуты "
 	}
 	s := int(secs) - h*3600 - m*60
-	if s-s/10*10 == 1 {
-		se = " секунду "
-	} else if s-s/10*10 < 5 && s-s/10*10 > 1 {
-		se = " секунды "
-	} else {
+	if s-s/10*10 > 4 || s-s/10*10 == 0 || s-s/100*100 > 10 && s-s/100*100 < 15 {
 		se = " секунд "
+	} else if s-s/10*10 == 1 {
+		se = " секунду "
+	} else {
+		se = " секунды "
 	}
 	if h > 0 {
 		text = fmt.Sprint(begin, " будет через ", h, ho, m, mi, "и ", s, se, " \n")
