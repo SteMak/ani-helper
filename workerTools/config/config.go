@@ -2,6 +2,8 @@ package config
 
 import (
 	"os"
+	"strconv"
+	"time"
 
 	"github.com/SteMak/ani-helper/workerTools/bankirapi"
 )
@@ -29,8 +31,8 @@ var (
 	ChForRequestID string
 	// ChForLogsID channelID
 	ChForLogsID string
-	// ChForBumpSiupID for monitoring
-	ChForBumpSiupID string
+	// ChForBustsID for monitoring
+	ChForBustsID string
 	// ChForInfoRequestID for give info about award to user
 	ChForInfoRequestID string
 
@@ -40,12 +42,33 @@ var (
 	UsSiupID string
 	// UsBumpID bump user
 	UsBumpID string
-
 	// UsLikeID like user
 	UsLikeID string
+	// UsRemindorID me user
+	UsRemindorID string
+
+	// TimeWaitSiup siup time
+	TimeWaitSiup int
+	// TimeWaitBump bump time
+	TimeWaitBump int
+	// TimeWaitLike like time
+	TimeWaitLike int
+	// TimeRemind remind time
+	TimeRemind int
+
+	// LastSiup siup user
+	LastSiup time.Time
+	// LastBump bump user
+	LastBump time.Time
+	// LastLike like user
+	LastLike time.Time
+	// LastRemind remind user
+	LastRemind time.Time
 
 	// RoRequestMakerID roleID
 	RoRequestMakerID string
+	// RoBuster roleID
+	RoBuster string
 
 	// PostgresURI uri of postgress
 	PostgresURI string
@@ -112,15 +135,22 @@ func Init() {
 
 	ChForRequestID = os.Getenv("CH_FOR_REQUEST_ID")
 	ChForLogsID = os.Getenv("CH_FOR_LOGS_ID")
-	ChForBumpSiupID = os.Getenv("CH_FOR_BUMP_SIUP_ID")
+	ChForBustsID = os.Getenv("CH_FOR_BUSTS_ID")
 	ChForInfoRequestID = os.Getenv("CH_FOR_INFO_REQUEST_ID")
 
 	UsConfirmatorID = os.Getenv("US_CONFIRMATOR_ID")
 	UsSiupID = os.Getenv("US_SIUP_ID")
 	UsBumpID = os.Getenv("US_BUMP_ID")
 	UsLikeID = os.Getenv("US_LIKE_ID")
+	UsRemindorID = os.Getenv("US_REMINDOR_ID")
+
+	TimeWaitSiup, _ = strconv.Atoi(os.Getenv("TIME_WAIT_SIUP"))
+	TimeWaitBump, _ = strconv.Atoi(os.Getenv("TIME_WAIT_BUMP"))
+	TimeWaitLike, _ = strconv.Atoi(os.Getenv("TIME_WAIT_LIKE"))
+	TimeRemind, _ = strconv.Atoi(os.Getenv("TIME_REMIND"))
 
 	RoRequestMakerID = os.Getenv("RO_REQUEST_MAKER_ID")
+	RoBuster = os.Getenv("RO_BUSTER")
 
 	PostgresURI = os.Getenv("DATABASE_URL")
 }

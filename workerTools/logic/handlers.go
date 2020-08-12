@@ -2,6 +2,8 @@ package logic
 
 import (
 	"fmt"
+	"strings"
+	"time"
 
 	"github.com/SteMak/ani-helper/workerTools/config"
 	"github.com/SteMak/ani-helper/workerTools/database"
@@ -24,7 +26,12 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 			return
 		}
 
-		if m.ChannelID == config.ChForBumpSiupID {
+		if m.ChannelID == config.ChForBustsID && len(m.Content) >= 10 && strings.ToLower(m.Content[:10]) == "когда" {
+			sendHelpBustMessage(s, m)
+			return
+		}
+
+		if m.ChannelID == config.ChForBustsID {
 			if len(chMonitorWriters) >= 30 {
 				chMonitorWriters = chMonitorWriters[1:]
 			}
@@ -35,8 +42,8 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 			})
 		}
 
-		if m.ChannelID == config.ChForBumpSiupID && len(m.Embeds) > 0 {
-			detectBumpSiup(s, m)
+		if m.ChannelID == config.ChForBustsID && len(m.Embeds) > 0 {
+			detectBusts(s, m)
 			return
 		}
 
@@ -67,4 +74,28 @@ func reactionHandler(s *discordgo.Session, r *discordgo.MessageReactionAdd) {
 
 		fmt.Println("GUILD " + item.EmbedID + " request processed successfuly")
 	}
+}
+
+func onStart(s *discordgo.Session) {
+	defineLastBusts(s)
+	checkAndRemind(s)
+
+	sleepSiup := int64(config.TimeWaitSiup)*60 - (time.Now().Unix() - config.LastSiup.Unix()) - int64(config.TimeRemind)*60
+	sleepBump := int64(config.TimeWaitBump)*60 - (time.Now().Unix() - config.LastBump.Unix()) - int64(config.TimeRemind)*60
+	sleepLike := int64(config.TimeWaitLike)*60 - (time.Now().Unix() - config.LastLike.Unix()) - int64(config.TimeRemind)*60
+
+	if sleepSiup > 0 {
+		go sleep(s, sleepSiup)
+	}
+	if sleepBump > 0 {
+		go sleep(s, sleepBump)
+	}
+	if sleepLike > 0 {
+		go sleep(s, sleepLike)
+	}
+}
+
+func sleep(s *discordgo.Session, sleep int64) {
+	time.Sleep(time.Duration(sleep) * time.Second)
+	checkAndRemind(s)
 }

@@ -8,6 +8,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/SteMak/ani-helper/workerTools/config"
 	"github.com/SteMak/ani-helper/workerTools/database"
@@ -18,30 +19,58 @@ var (
 	err error
 )
 
-func detectBumpSiup(s *discordgo.Session, m *discordgo.MessageCreate) {
+func isSiup(m *discordgo.Message) bool {
 	if m.Author.ID == config.UsSiupID &&
+		len(m.Embeds) > 0 &&
 		m.Embeds[0].Title == "Сервер Up" &&
 		m.Embeds[0].Footer != nil {
+		return true
+	}
 
+	return false
+}
+
+func isBump(m *discordgo.Message) bool {
+	if m.Author.ID == config.UsBumpID &&
+		len(m.Embeds) > 0 {
+
+		matched, err := regexp.Match(`Server bumped by <@\d+>`, []byte(m.Embeds[0].Description))
+		if err != nil {
+			fmt.Println("ERROR Bump make match regular failure:", err)
+			return false
+		}
+		if matched {
+			return true
+		}
+	}
+
+	return false
+}
+
+func isLike(m *discordgo.Message) bool {
+	if m.Author.ID == config.UsLikeID &&
+		len(m.Embeds) > 0 &&
+		len(m.Embeds[0].Description) > 0 &&
+		m.Embeds[0].Description[:50] == "Вы успешно лайкнули сервер." &&
+		m.Embeds[0].Author != nil {
+		return true
+	}
+
+	return false
+}
+
+func detectBusts(s *discordgo.Session, m *discordgo.MessageCreate) {
+	if isSiup(m.Message) {
 		onSiupServer(s, m)
 		return
 	}
 
-	matched, err := regexp.Match(`Server bumped by <@\d+>`, []byte(m.Embeds[0].Description))
-	if err != nil {
-		fmt.Println("ERROR Bump make match regular failure:", err)
-		return
-	}
-
-	if matched && m.Author.ID == config.UsBumpID {
+	if isBump(m.Message) {
 		onBumpServer(s, m)
 		return
 	}
 
-	if m.Author.ID == config.UsLikeID &&
-		m.Embeds[0].Description == "Вы успешно лайкнули сервер." &&
-		m.Embeds[0].Author != nil {
-
+	if isLike(m.Message) {
 		onLikeServer(s, m)
 		return
 	}
@@ -55,6 +84,7 @@ func onSiupServer(s *discordgo.Session, m *discordgo.MessageCreate) {
 			fmt.Println("FOUND S.up user", user.id)
 
 			sendAndLog(s, user.id, "S.up", config.SumForPaying)
+			go sleep(s, int64(config.TimeWaitBump-config.TimeRemind)*60)
 			return
 		}
 	}
@@ -76,6 +106,7 @@ func onBumpServer(s *discordgo.Session, m *discordgo.MessageCreate) {
 	fmt.Println("FOUND Bump user", userID)
 
 	sendAndLog(s, userID, "Bump", config.SumForPaying)
+	go sleep(s, int64(config.TimeWaitBump-config.TimeRemind)*60)
 }
 
 func onLikeServer(s *discordgo.Session, m *discordgo.MessageCreate) {
@@ -86,6 +117,7 @@ func onLikeServer(s *discordgo.Session, m *discordgo.MessageCreate) {
 			fmt.Println("FOUND Like user", user.id)
 
 			sendAndLog(s, user.id, "Like", config.SumForPaying)
+			go sleep(s, int64(config.TimeWaitBump-config.TimeRemind)*60)
 			return
 		}
 	}
@@ -104,7 +136,7 @@ func sendAndLog(s *discordgo.Session, userID string, str string, sum string) {
 		if err != nil {
 			fmt.Println("ERROR "+str+" sending wrong report message:", err)
 		}
-		_, err = s.ChannelMessageSend(config.ChForBumpSiupID, "<@"+userID+">, у нас снова что-то сломалось, но не волнуйтесь - деньги Вам прилетят чуть позже)")
+		_, err = s.ChannelMessageSend(config.ChForBustsID, "<@"+userID+">, у нас снова что-то сломалось, но не волнуйтесь - деньги Вам прилетят чуть позже)")
 		if err != nil {
 			fmt.Println("ERROR "+str+" sending wrong log message:", err)
 		}
@@ -117,7 +149,7 @@ func sendAndLog(s *discordgo.Session, userID string, str string, sum string) {
 		fmt.Println("ERROR "+str+" sending right report message:", err)
 	}
 
-	_, err = s.ChannelMessageSend(config.ChForBumpSiupID, "<@"+userID+">, "+fmt.Sprintf(config.Responces[rand.Intn(len(config.Responces))], str, sum+"<:AH_AniCoin:579712087224483850>"))
+	_, err = s.ChannelMessageSend(config.ChForBustsID, "<@"+userID+">, "+fmt.Sprintf(config.Responces[rand.Intn(len(config.Responces))], str, sum+"<:AH_AniCoin:579712087224483850>"))
 	if err != nil {
 		fmt.Println("ERROR "+str+" sending right log message:", err)
 	}
@@ -405,4 +437,138 @@ func checkRequest(str string) (bool, string) {
 	}
 
 	return false, ""
+}
+
+func isRemind(m *discordgo.Message) bool {
+	if m.Author.ID == config.UsRemindorID &&
+		strings.Contains(m.Content, ">, Скоро будет ") {
+		return true
+	}
+
+	return false
+}
+
+func defineLastBusts(s *discordgo.Session) {
+	beforeID := ""
+	var timeZero time.Time
+	for config.LastBump == timeZero || config.LastSiup == timeZero || config.LastLike == timeZero {
+		mess, err := s.ChannelMessages(config.ChForBustsID, 100, beforeID, "", "")
+		if err != nil {
+			fmt.Println("ERROR getting messages", err)
+			continue
+		}
+
+		for _, m := range mess {
+			if isSiup(m) && config.LastSiup == timeZero {
+				config.LastSiup, _ = m.Timestamp.Parse()
+			}
+			if isBump(m) && config.LastBump == timeZero {
+				config.LastBump, _ = m.Timestamp.Parse()
+			}
+			if isLike(m) && config.LastLike == timeZero {
+				config.LastLike, _ = m.Timestamp.Parse()
+			}
+			if isRemind(m) && config.LastRemind == timeZero {
+				config.LastRemind, _ = m.Timestamp.Parse()
+			}
+		}
+		beforeID = mess[len(mess)-1].ID
+	}
+}
+
+func checkAndRemind(s *discordgo.Session) {
+	if time.Now().Unix() >= config.LastLike.Unix()+int64((config.TimeWaitLike-config.TimeRemind)*60) {
+		remind(s, "Like")
+	}
+	if time.Now().Unix() >= config.LastBump.Unix()+int64((config.TimeWaitBump-config.TimeRemind)*60) {
+		remind(s, "Bump")
+	}
+	if time.Now().Unix() >= config.LastSiup.Unix()+int64((config.TimeWaitSiup-config.TimeRemind)*60) {
+		remind(s, "Siup")
+	}
+}
+
+func remind(s *discordgo.Session, str string) {
+	if time.Now().Unix() >= config.LastRemind.Unix()+int64(config.TimeRemind)*60 {
+		config.LastRemind = time.Now()
+		_, err := s.ChannelMessageSend(config.ChForBustsID, "<@&"+config.RoBuster+">, Скоро будет "+str)
+		if err != nil {
+			fmt.Println("ERROR Remind send:", err)
+			return
+		}
+		fmt.Println("PRINT Remind " + str)
+	} else {
+		config.LastRemind = time.Now()
+		_, err := s.ChannelMessageSend(config.ChForBustsID, "Скоро будет "+str)
+		if err != nil {
+			fmt.Println("ERROR Remind send:", err)
+			return
+		}
+		fmt.Println("PRINT ShadowRemind " + str)
+	}
+}
+
+func secondsToString(begin string, secs int64) string {
+	if secs < 0 {
+		return fmt.Sprint(begin, " проспали!")
+	}
+	text := ""
+	ho := ""
+	mi := ""
+	se := ""
+	h := int(secs / 3600)
+	if h-h/10*10 == 1 {
+		ho = " час "
+	} else if h-h/10*10 < 5 && h-h/10*10 > 1 {
+		ho = " часа "
+	} else {
+		ho = " часов "
+	}
+	m := int(secs/60) - h*60
+	if m-m/10*10 == 1 {
+		mi = " минуту "
+	} else if m-m/10*10 < 5 && m-m/10*10 > 1 {
+		mi = " минуты "
+	} else {
+		mi = " минут "
+	}
+	s := int(secs) - h*3600 - m*60
+	if s-s/10*10 == 1 {
+		se = " секунду "
+	} else if s-s/10*10 < 5 && s-s/10*10 > 1 {
+		se = " секунды "
+	} else {
+		se = " секунд "
+	}
+	if h > 0 {
+		text = fmt.Sprint(begin, " будет через ", h, ho, m, mi, "и ", s, se, " \n")
+	} else if m > 0 {
+		text = fmt.Sprint(begin, " будет через ", m, mi, "и ", s, se, " \n")
+	} else {
+		text = fmt.Sprint(begin, " будет через ", s, se, " \n")
+	}
+	return text
+}
+
+func sendHelpBustMessage(s *discordgo.Session, m *discordgo.MessageCreate) {
+	text := "```cs\n"
+	sleepSiup := int64(config.TimeWaitSiup)*60 - (time.Now().Unix() - config.LastSiup.Unix())
+	text += secondsToString("S.up", sleepSiup)
+	sleepBump := int64(config.TimeWaitBump)*60 - (time.Now().Unix() - config.LastBump.Unix())
+	text += secondsToString("Bump", sleepBump)
+	sleepLike := int64(config.TimeWaitLike)*60 - (time.Now().Unix() - config.LastLike.Unix())
+	text += secondsToString("Like", sleepLike)
+	text += "\n```"
+
+	_, err := s.ChannelMessageSendEmbed(m.ChannelID, &discordgo.MessageEmbed{
+		Author: &discordgo.MessageEmbedAuthor{
+			IconURL: m.Author.AvatarURL("128"),
+			Name:    m.Author.Username + "#" + m.Author.Discriminator,
+		},
+		Description: text,
+		Color:       5869507,
+	})
+	if err != nil {
+		fmt.Println("ERROR sending helping embed", err)
+	}
 }

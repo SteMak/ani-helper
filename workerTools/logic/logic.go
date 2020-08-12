@@ -19,6 +19,8 @@ func Init() {
 
 	fmt.Println("2 Discord session created")
 
+	onStart(session)
+
 	session.AddHandler(messageCreate)
 	session.AddHandler(reactionHandler)
 
