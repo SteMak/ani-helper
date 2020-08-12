@@ -37,6 +37,14 @@ func detectBumpSiup(s *discordgo.Session, m *discordgo.MessageCreate) {
 		onBumpServer(s, m)
 		return
 	}
+
+	if m.Author.ID == config.UsLikeID &&
+		m.Embeds[0].Description == "Вы успешно лайкнули сервер." &&
+		m.Embeds[0].Author != nil {
+
+		onLikeServer(s, m)
+		return
+	}
 }
 
 func onSiupServer(s *discordgo.Session, m *discordgo.MessageCreate) {
@@ -68,6 +76,19 @@ func onBumpServer(s *discordgo.Session, m *discordgo.MessageCreate) {
 	fmt.Println("FOUND Bump user", userID)
 
 	sendAndLog(s, userID, "Bump", config.SumForPaying)
+}
+
+func onLikeServer(s *discordgo.Session, m *discordgo.MessageCreate) {
+	fmt.Println("FOUND Like")
+
+	for _, user := range chMonitorWriters {
+		if user.strify == m.Embeds[0].Author.Name {
+			fmt.Println("FOUND Like user", user.id)
+
+			sendAndLog(s, user.id, "Like", config.SumForPaying)
+			return
+		}
+	}
 }
 
 func sendAndLog(s *discordgo.Session, userID string, str string, sum string) {

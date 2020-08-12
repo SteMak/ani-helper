@@ -41,6 +41,9 @@ var (
 	// UsBumpID bump user
 	UsBumpID string
 
+	// UsLikeID like user
+	UsLikeID string
+
 	// RoRequestMakerID roleID
 	RoRequestMakerID string
 
@@ -115,6 +118,7 @@ func Init() {
 	UsConfirmatorID = os.Getenv("US_CONFIRMATOR_ID")
 	UsSiupID = os.Getenv("US_SIUP_ID")
 	UsBumpID = os.Getenv("US_BUMP_ID")
+	UsLikeID = os.Getenv("US_LIKE_ID")
 
 	RoRequestMakerID = os.Getenv("RO_REQUEST_MAKER_ID")
 
