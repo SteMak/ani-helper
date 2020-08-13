@@ -85,7 +85,7 @@ func onSiupServer(s *discordgo.Session, m *discordgo.MessageCreate) {
 			fmt.Println("FOUND S.up user", user.id)
 
 			sendAndLog(s, user.id, "S.up", config.SumForPaying)
-			go sleep(s, int64(config.TimeWaitBump-config.TimeRemind)*60)
+			go sleep(s, int64(config.TimeWaitBump*60-config.TimeRemind))
 			return
 		}
 	}
@@ -108,7 +108,7 @@ func onBumpServer(s *discordgo.Session, m *discordgo.MessageCreate) {
 	fmt.Println("FOUND Bump user", userID)
 
 	sendAndLog(s, userID, "Bump", config.SumForPaying)
-	go sleep(s, int64(config.TimeWaitBump-config.TimeRemind)*60)
+	go sleep(s, int64(config.TimeWaitBump*60-config.TimeRemind))
 }
 
 func onLikeServer(s *discordgo.Session, m *discordgo.MessageCreate) {
@@ -120,7 +120,7 @@ func onLikeServer(s *discordgo.Session, m *discordgo.MessageCreate) {
 			fmt.Println("FOUND Like user", user.id)
 
 			sendAndLog(s, user.id, "Like", config.SumForPaying)
-			go sleep(s, int64(config.TimeWaitBump-config.TimeRemind)*60)
+			go sleep(s, int64(config.TimeWaitBump*60-config.TimeRemind))
 			return
 		}
 	}
@@ -480,19 +480,19 @@ func defineLastBusts(s *discordgo.Session) {
 }
 
 func checkAndRemind(s *discordgo.Session) {
-	if time.Now().Unix() >= config.LastLike.Unix()+int64((config.TimeWaitLike-config.TimeRemind)*60) {
+	if time.Now().Unix() >= config.LastLike.Unix()+int64(config.TimeWaitLike*60-config.TimeRemind) {
 		remind(s, "Like")
 	}
-	if time.Now().Unix() >= config.LastBump.Unix()+int64((config.TimeWaitBump-config.TimeRemind)*60) {
+	if time.Now().Unix() >= config.LastBump.Unix()+int64(config.TimeWaitBump*60-config.TimeRemind) {
 		remind(s, "Bump")
 	}
-	if time.Now().Unix() >= config.LastSiup.Unix()+int64((config.TimeWaitSiup-config.TimeRemind)*60) {
+	if time.Now().Unix() >= config.LastSiup.Unix()+int64(config.TimeWaitSiup*60-config.TimeRemind) {
 		remind(s, "Siup")
 	}
 }
 
 func remind(s *discordgo.Session, str string) {
-	if time.Now().Unix() >= config.LastRemind.Unix()+int64(config.TimeRemind)*60 {
+	if time.Now().Unix() >= config.LastRemind.Unix()+int64(config.TimeDoubleRemind)*60 {
 		config.LastRemind = time.Now()
 		_, err := s.ChannelMessageSend(config.ChForBustsID, "<@&"+config.RoBuster+">, Скоро будет "+str)
 		if err != nil {
@@ -501,14 +501,21 @@ func remind(s *discordgo.Session, str string) {
 		}
 		fmt.Println("PRINT Remind " + str)
 	} else {
-		config.LastRemind = time.Now()
 		_, err := s.ChannelMessageSend(config.ChForBustsID, "Скоро будет "+str)
 		if err != nil {
-			fmt.Println("ERROR Remind send:", err)
+			fmt.Println("ERROR ShadowRemind send:", err)
 			return
 		}
 		fmt.Println("PRINT ShadowRemind " + str)
 	}
+	time.Sleep(time.Duration(config.TimeRemind) * time.Second)
+
+	_, err := s.ChannelMessageSend(config.ChForBustsID, str+" заряжен!")
+	if err != nil {
+		fmt.Println("ERROR LastRemind send:", err)
+		return
+	}
+	fmt.Println("PRINT LastRemind " + str)
 }
 
 func secondsToString(begin string, secs int64) string {

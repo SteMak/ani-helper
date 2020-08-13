@@ -55,6 +55,8 @@ var (
 	TimeWaitLike int
 	// TimeRemind remind time
 	TimeRemind int
+	// TImeDoubleRemind remind time
+	TimeDoubleRemind int
 
 	// LastSiup siup user
 	LastSiup time.Time
@@ -148,6 +150,7 @@ func Init() {
 	TimeWaitBump, _ = strconv.Atoi(os.Getenv("TIME_WAIT_BUMP"))
 	TimeWaitLike, _ = strconv.Atoi(os.Getenv("TIME_WAIT_LIKE"))
 	TimeRemind, _ = strconv.Atoi(os.Getenv("TIME_REMIND"))
+	TimeDoubleRemind, _ = strconv.Atoi(os.Getenv("TIME_DOUBLE_REMIND"))
 
 	RoRequestMakerID = os.Getenv("RO_REQUEST_MAKER_ID")
 	RoBuster = os.Getenv("RO_BUSTER")

@@ -80,9 +80,9 @@ func onStart(s *discordgo.Session) {
 	defineLastBusts(s)
 	checkAndRemind(s)
 
-	sleepSiup := int64(config.TimeWaitSiup)*60 - (time.Now().Unix() - config.LastSiup.Unix()) - int64(config.TimeRemind)*60
-	sleepBump := int64(config.TimeWaitBump)*60 - (time.Now().Unix() - config.LastBump.Unix()) - int64(config.TimeRemind)*60
-	sleepLike := int64(config.TimeWaitLike)*60 - (time.Now().Unix() - config.LastLike.Unix()) - int64(config.TimeRemind)*60
+	sleepSiup := int64(config.TimeWaitSiup)*60 - (time.Now().Unix() - config.LastSiup.Unix()) - int64(config.TimeRemind)
+	sleepBump := int64(config.TimeWaitBump)*60 - (time.Now().Unix() - config.LastBump.Unix()) - int64(config.TimeRemind)
+	sleepLike := int64(config.TimeWaitLike)*60 - (time.Now().Unix() - config.LastLike.Unix()) - int64(config.TimeRemind)
 
 	if sleepSiup > 0 {
 		go sleep(s, sleepSiup)
