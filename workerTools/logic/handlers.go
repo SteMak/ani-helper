@@ -78,24 +78,26 @@ func reactionHandler(s *discordgo.Session, r *discordgo.MessageReactionAdd) {
 
 func onStart(s *discordgo.Session) {
 	defineLastBusts(s)
-	checkAndRemind(s)
+	go checkAndRemind(s, "S.up")
+	go checkAndRemind(s, "Bump")
+	go checkAndRemind(s, "Like")
 
 	sleepSiup := int64(config.TimeWaitSiup)*60 - (time.Now().Unix() - config.LastSiup.Unix()) - int64(config.TimeRemind)
 	sleepBump := int64(config.TimeWaitBump)*60 - (time.Now().Unix() - config.LastBump.Unix()) - int64(config.TimeRemind)
 	sleepLike := int64(config.TimeWaitLike)*60 - (time.Now().Unix() - config.LastLike.Unix()) - int64(config.TimeRemind)
 
 	if sleepSiup > 0 {
-		go sleep(s, sleepSiup)
+		go sleep(s, sleepSiup, "S.up")
 	}
 	if sleepBump > 0 {
-		go sleep(s, sleepBump)
+		go sleep(s, sleepBump, "Bump")
 	}
 	if sleepLike > 0 {
-		go sleep(s, sleepLike)
+		go sleep(s, sleepLike, "Like")
 	}
 }
 
-func sleep(s *discordgo.Session, sleep int64) {
+func sleep(s *discordgo.Session, sleep int64, str string) {
 	time.Sleep(time.Duration(sleep) * time.Second)
-	checkAndRemind(s)
+	checkAndRemind(s, str)
 }
