@@ -487,7 +487,7 @@ func checkAndRemind(s *discordgo.Session) {
 		remind(s, "Bump")
 	}
 	if time.Now().Unix() >= config.LastSiup.Unix()+int64(config.TimeWaitSiup*60-config.TimeRemind) {
-		remind(s, "Siup")
+		remind(s, "S.up")
 	}
 }
 
