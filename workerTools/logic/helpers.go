@@ -48,7 +48,7 @@ func isBump(m *discordgo.Message) bool {
 }
 
 func isLike(m *discordgo.Message) bool {
-	if m.Author.ID == config.UsLikeID &&
+	if (m.Author.ID == config.UsLikeID || m.WebhookID == config.WhLikeID) &&
 		len(m.Embeds) > 0 &&
 		len(m.Embeds[0].Description) > 0 &&
 		m.Embeds[0].Description[:50] == "Вы успешно лайкнули сервер." &&

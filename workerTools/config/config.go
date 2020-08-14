@@ -146,6 +146,8 @@ func Init() {
 	UsLikeID = os.Getenv("US_LIKE_ID")
 	UsRemindorID = os.Getenv("US_REMINDOR_ID")
 
+	WhLikeID = os.Getenv("WH_LIKE_ID")
+
 	TimeWaitSiup, _ = strconv.Atoi(os.Getenv("TIME_WAIT_SIUP"))
 	TimeWaitBump, _ = strconv.Atoi(os.Getenv("TIME_WAIT_BUMP"))
 	TimeWaitLike, _ = strconv.Atoi(os.Getenv("TIME_WAIT_LIKE"))
