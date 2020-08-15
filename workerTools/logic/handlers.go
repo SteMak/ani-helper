@@ -26,7 +26,7 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 			return
 		}
 
-		if m.ChannelID == config.ChForBustsID && len(m.Content) >= 10 && strings.ToLower(m.Content[:10]) == "когда" {
+		if m.ChannelID == config.ChForBustsID && len(m.Content) >= 10 && strings.HasPrefix(strings.ToLower(m.Content), "когда") {
 			sendHelpBustMessage(s, m)
 			return
 		}

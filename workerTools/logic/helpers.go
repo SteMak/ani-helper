@@ -51,7 +51,7 @@ func isLike(m *discordgo.Message) bool {
 	if (m.Author.ID == config.UsLikeID || m.WebhookID == config.WhLikeID) &&
 		len(m.Embeds) > 0 &&
 		len(m.Embeds[0].Description) > 0 &&
-		m.Embeds[0].Description[:50] == "Вы успешно лайкнули сервер." &&
+		strings.HasPrefix(m.Embeds[0].Description, "Вы успешно лайкнули сервер.") &&
 		m.Embeds[0].Author != nil {
 		return true
 	}

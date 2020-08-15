@@ -46,6 +46,8 @@ var (
 	UsLikeID string
 	// UsRemindorID me user
 	UsRemindorID string
+	// WhLikeID me user
+	WhLikeID string
 
 	// TimeWaitSiup siup time
 	TimeWaitSiup int
@@ -55,7 +57,7 @@ var (
 	TimeWaitLike int
 	// TimeRemind remind time
 	TimeRemind int
-	// TImeDoubleRemind remind time
+	// TimeDoubleRemind remind time
 	TimeDoubleRemind int
 
 	// LastSiup siup user
