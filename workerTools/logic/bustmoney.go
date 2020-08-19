@@ -87,11 +87,20 @@ func sendAndLog(s *discordgo.Session, userID string, str string, sum string) {
 	if err != nil {
 		fmt.Println("ERROR "+str+" updating user balance:", err)
 
-		_, err = s.ChannelMessageSend(config.ChForLogsID, "Кажись, что-то пошло не так... <@"+userID+"> сделал "+str+", но денег ему не дали(")
+		_, err = s.ChannelMessageSendComplex(config.ChForInfoRequestID, &discordgo.MessageSend{
+			Content: "<@&" + config.RoMainWorker + ">",
+			Embed: &discordgo.MessageEmbed{
+				Color:       16711680,
+				Description: "Кажись, что-то пошло не так... <@" + userID + "> сделал " + str + ", но денег ему не дали(",
+			},
+		})
 		if err != nil {
 			fmt.Println("ERROR "+str+" sending wrong report message:", err)
 		}
-		_, err = s.ChannelMessageSend(config.ChForBustsID, "<@"+userID+">, у нас снова что-то сломалось, но не волнуйтесь - деньги Вам прилетят чуть позже)")
+		_, err = s.ChannelMessageSendEmbed(config.ChForBustsID, &discordgo.MessageEmbed{
+			Color:       16711680,
+			Description: "<@" + userID + ">, у нас снова что-то сломалось, но не волнуйтесь - деньги Вам прилетят чуть позже)" + " Обратитесь за конпенсацией к Главному Разработчику",
+		})
 		if err != nil {
 			fmt.Println("ERROR "+str+" sending wrong log message:", err)
 		}
@@ -99,12 +108,17 @@ func sendAndLog(s *discordgo.Session, userID string, str string, sum string) {
 		return
 	}
 
-	_, err = s.ChannelMessageSend(config.ChForLogsID, sum+"<:AH_AniCoin:579712087224483850> были выданы <@"+userID+">, за то что он сделал "+str)
+	_, err = s.ChannelMessageSendEmbed(config.ChForLogsID, &discordgo.MessageEmbed{
+		Color:       255255,
+		Description: sum + "<:AH_AniCoin:579712087224483850> были выданы <@" + userID + ">, за то что он сделал " + str,
+	})
 	if err != nil {
 		fmt.Println("ERROR "+str+" sending right report message:", err)
 	}
-
-	_, err = s.ChannelMessageSend(config.ChForBustsID, "<@"+userID+">, "+fmt.Sprintf(config.Responces[rand.Intn(len(config.Responces))], str, sum+"<:AH_AniCoin:579712087224483850>"))
+	_, err = s.ChannelMessageSendEmbed(config.ChForBustsID, &discordgo.MessageEmbed{
+		Color:       255255,
+		Description: "<@" + userID + ">, " + fmt.Sprintf(config.Responces[rand.Intn(len(config.Responces))], str, sum+"<:AH_AniCoin:579712087224483850>"),
+	})
 	if err != nil {
 		fmt.Println("ERROR "+str+" sending right log message:", err)
 	}

@@ -73,6 +73,8 @@ var (
 	RoRequestMakerID string
 	// RoBuster roleID
 	RoBuster string
+	// RoMainWorker roleID
+	RoMainWorker string
 
 	// PostgresURI uri of postgress
 	PostgresURI string
@@ -158,6 +160,7 @@ func Init() {
 
 	RoRequestMakerID = os.Getenv("RO_REQUEST_MAKER_ID")
 	RoBuster = os.Getenv("RO_BUSTER")
+	RoMainWorker = os.Getenv("RO_MAIN_WORKER")
 
 	PostgresURI = os.Getenv("DATABASE_URL")
 }

@@ -25,16 +25,35 @@ func createEmbed(s *discordgo.Session, item *database.Record, color int) *discor
 				_, err = config.API.AddToBalance(config.GdHouseID, user, 0, int(userSum.Sum), item.Reason)
 				if err != nil {
 					fmt.Println("ERROR "+item.EmbedID+" add money to user balance:", err)
-					_, err = s.ChannelMessageSend(config.ChForLogsID, "Кажись, что-то пошло не так... <@"+user+"> не получил денег за "+item.Reason)
+					_, err = s.ChannelMessageSendEmbed(config.ChForInfoRequestID, &discordgo.MessageEmbed{
+						Color:       16711680,
+						Description: "Кажись, что-то пошло не так... <@" + user + "> не получил денег за " + item.Reason + ". Обратитесь за конпенсацией к Главному Разработчику",
+					})
+					if err != nil {
+						fmt.Println("ERROR "+item.EmbedID+" sending wrong info message:", err)
+					}
+					_, err = s.ChannelMessageSendComplex(config.ChForLogsID, &discordgo.MessageSend{
+						Content: "<@&" + config.RoMainWorker + ">",
+						Embed: &discordgo.MessageEmbed{
+							Color:       16711680,
+							Description: "Кажись, что-то пошло не так... " + strconv.FormatUint(userSum.Sum, 10) + "<:AH_AniCoin:579712087224483850> не были выданы <@" + user + ">, за " + item.Reason,
+						},
+					})
 					if err != nil {
 						fmt.Println("ERROR "+item.EmbedID+" sending wrong report message:", err)
 					}
 				} else {
-					_, err = s.ChannelMessageSend(config.ChForInfoRequestID, "<@"+user+">, "+"Вы получили "+strconv.FormatUint(userSum.Sum, 10)+"<:AH_AniCoin:579712087224483850>. Причина: "+item.Reason)
+					_, err = s.ChannelMessageSendEmbed(config.ChForInfoRequestID, &discordgo.MessageEmbed{
+						Color:       255255,
+						Description: "<@" + user + ">, " + "Вы получили " + strconv.FormatUint(userSum.Sum, 10) + "<:AH_AniCoin:579712087224483850>. Причина: " + item.Reason,
+					})
 					if err != nil {
 						fmt.Println("ERROR "+item.EmbedID+" sending right info message:", err)
 					}
-					_, err = s.ChannelMessageSend(config.ChForLogsID, strconv.FormatUint(userSum.Sum, 10)+"<:AH_AniCoin:579712087224483850> были выданы <@"+user+">, за "+item.Reason)
+					_, err = s.ChannelMessageSendEmbed(config.ChForLogsID, &discordgo.MessageEmbed{
+						Color:       255255,
+						Description: strconv.FormatUint(userSum.Sum, 10) + "<:AH_AniCoin:579712087224483850> были выданы <@" + user + ">, за " + item.Reason,
+					})
 					if err != nil {
 						fmt.Println("ERROR "+item.EmbedID+" sending right report message:", err)
 					}
