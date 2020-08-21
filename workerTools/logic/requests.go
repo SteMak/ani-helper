@@ -33,7 +33,7 @@ func createEmbed(s *discordgo.Session, item *database.Record, color int) *discor
 						fmt.Println("ERROR "+item.EmbedID+" sending wrong info message:", err)
 					}
 					_, err = s.ChannelMessageSendComplex(config.ChForLogsID, &discordgo.MessageSend{
-						Content: "<@&" + config.RoMainWorker + ">",
+						Content: "<@" + config.UsMainWorker + ">",
 						Embed: &discordgo.MessageEmbed{
 							Color:       16711680,
 							Description: "Кажись, что-то пошло не так... " + strconv.FormatUint(userSum.Sum, 10) + "<:AH_AniCoin:579712087224483850> не были выданы <@" + user + ">, за " + item.Reason,

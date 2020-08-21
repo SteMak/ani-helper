@@ -46,6 +46,9 @@ var (
 	UsLikeID string
 	// UsRemindorID me user
 	UsRemindorID string
+	// UsMainWorker roleID
+	UsMainWorker string
+
 	// WhLikeID me user
 	WhLikeID string
 
@@ -73,8 +76,6 @@ var (
 	RoRequestMakerID string
 	// RoBuster roleID
 	RoBuster string
-	// RoMainWorker roleID
-	RoMainWorker string
 
 	// PostgresURI uri of postgress
 	PostgresURI string
@@ -149,6 +150,7 @@ func Init() {
 	UsBumpID = os.Getenv("US_BUMP_ID")
 	UsLikeID = os.Getenv("US_LIKE_ID")
 	UsRemindorID = os.Getenv("US_REMINDOR_ID")
+	UsMainWorker = os.Getenv("US_MAIN_WORKER")
 
 	WhLikeID = os.Getenv("WH_LIKE_ID")
 
@@ -160,7 +162,6 @@ func Init() {
 
 	RoRequestMakerID = os.Getenv("RO_REQUEST_MAKER_ID")
 	RoBuster = os.Getenv("RO_BUSTER")
-	RoMainWorker = os.Getenv("RO_MAIN_WORKER")
 
 	PostgresURI = os.Getenv("DATABASE_URL")
 }
