@@ -88,7 +88,7 @@ func sendAndLog(s *discordgo.Session, userID string, str string, sum string) {
 		fmt.Println("ERROR "+str+" updating user balance:", err)
 
 		_, err = s.ChannelMessageSendComplex(config.ChForLogsID, &discordgo.MessageSend{
-			Content: "<@" + config.MainWorker + ">",
+			Content: "<@" + config.UsMainWorker + ">",
 			Embed: &discordgo.MessageEmbed{
 				Color:       16711680,
 				Description: "Кажись, что-то пошло не так... <@" + userID + "> сделал " + str + ", но денег ему не дали(",
