@@ -62,7 +62,11 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 }
 
 func reactionHandler(s *discordgo.Session, r *discordgo.MessageReactionAdd) {
-	if r.ChannelID == config.ChForRequestID && r.UserID == config.UsConfirmatorID {
+	tryConfirm, err := s.GuildMember(config.GdHouseID, r.UserID)
+	if err != nil {
+		return
+	}
+	if r.ChannelID == config.ChForRequestID && hasRole(tryConfirm, config.RoConfirmatorID) {
 		item, err := database.Records.Record(r.MessageID)
 		if err != nil {
 			return

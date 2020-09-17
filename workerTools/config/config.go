@@ -36,8 +36,8 @@ var (
 	// ChForInfoRequestID for give info about award to user
 	ChForInfoRequestID string
 
-	// UsConfirmatorID userID
-	UsConfirmatorID string
+	// RoConfirmatorID userID
+	RoConfirmatorID string
 	// UsSiupID siup user
 	UsSiupID string
 	// UsBumpID bump user
@@ -145,7 +145,7 @@ func Init() {
 	ChForBustsID = os.Getenv("CH_FOR_BUSTS_ID")
 	ChForInfoRequestID = os.Getenv("CH_FOR_INFO_REQUEST_ID")
 
-	UsConfirmatorID = os.Getenv("US_CONFIRMATOR_ID")
+	RoConfirmatorID = os.Getenv("RO_CONFIRMATOR_ID")
 	UsSiupID = os.Getenv("US_SIUP_ID")
 	UsBumpID = os.Getenv("US_BUMP_ID")
 	UsLikeID = os.Getenv("US_LIKE_ID")
