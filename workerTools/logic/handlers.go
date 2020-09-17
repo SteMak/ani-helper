@@ -64,6 +64,7 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 func reactionHandler(s *discordgo.Session, r *discordgo.MessageReactionAdd) {
 	tryConfirm, err := s.GuildMember(config.GdHouseID, r.UserID)
 	if err != nil {
+		fmt.Println("ERROR getting guild member", err)
 		return
 	}
 	if r.ChannelID == config.ChForRequestID && hasRole(tryConfirm, config.RoConfirmatorID) {
