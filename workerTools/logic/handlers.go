@@ -66,7 +66,7 @@ func reactionHandler(s *discordgo.Session, r *discordgo.MessageReactionAdd) {
 	if err != nil {
 		return
 	}
-	if r.ChannelID == config.ChForRequestID && hasRole(tryConfirm, config.RoConfirmatorID) {
+	if r.UserID != s.State.User.ID && r.ChannelID == config.ChForRequestID && hasRole(tryConfirm, config.RoConfirmatorID) {
 		item, err := database.Records.Record(r.MessageID)
 		if err != nil {
 			fmt.Println("ERROR database failure", err)
