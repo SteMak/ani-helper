@@ -1,2 +1,4 @@
 temp
 bin
+env
+env.save
