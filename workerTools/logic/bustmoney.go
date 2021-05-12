@@ -65,8 +65,16 @@ func onBumpServer(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 func onLikeServer(s *discordgo.Session, m *discordgo.MessageCreate) {
 	config.LastLike = time.Now()
-	go sleep(s, int64(config.TimeWaitBump*60-config.TimeRemind), "Like")
+
+        go sleep(s, int64(config.TimeWaitBump*60-config.TimeRemind), "Like")
 	fmt.Println("FOUND Like")
+
+        if (m.Interaction != nil) {
+                fmt.Println("FOUND Like user", m.Interaction.User.ID)
+
+                sendAndLog(s, m.Interaction.User.ID, "Like", config.SumForPaying)
+                return
+        }
 
 	for _, user := range chMonitorWriters {
 		if user.strify == m.Embeds[0].Author.Name {
