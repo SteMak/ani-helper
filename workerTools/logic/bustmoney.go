@@ -87,6 +87,10 @@ func onLikeServer(s *discordgo.Session, m *discordgo.MessageCreate) {
 }
 
 func sendAndLog(s *discordgo.Session, userID string, str string, sum string) {
+	if rand.Intn(100) == 0 {
+		sum = sum + "0"
+	}
+
 	isum, err := strconv.Atoi(sum)
 	if err != nil {
 		fmt.Println("ERROR "+str+" parsing sum:", err)
