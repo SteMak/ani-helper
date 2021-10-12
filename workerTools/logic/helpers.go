@@ -22,8 +22,8 @@ func isRemind(m *discordgo.Message) bool {
 func isSiup(m *discordgo.Message) bool {
 	if m.Author.ID == config.UsSiupID &&
 		len(m.Embeds) > 0 &&
-		m.Embeds[0].Title == "Сервер Up" &&
-		m.Embeds[0].Footer != nil {
+		m.Embeds[0].Description[0:24] == "**Успешный Up!**" &&
+		m.Interaction != nil {
 		return true
 	}
 

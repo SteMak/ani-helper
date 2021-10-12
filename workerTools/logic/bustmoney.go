@@ -34,7 +34,7 @@ func onSiupServer(s *discordgo.Session, m *discordgo.MessageCreate) {
 	fmt.Println("FOUND S.up")
 
 	for _, user := range chMonitorWriters {
-		if user.strify == m.Embeds[0].Footer.Text {
+		if user.strify == m.Interaction.Member.User.ID {
 			fmt.Println("FOUND S.up user", user.id)
 
 			sendAndLog(s, user.id, "S.up", config.SumForPaying)
